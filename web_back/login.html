@@ -9,15 +9,17 @@
     <link rel="stylesheet" type="text/css" href="css/reset.css">
     <link rel="stylesheet" type="text/css" href="css/iconfont.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" href="./js/bootstrap/css/bootstrap.min.css">
 </head>
 
 <body>
     <div class="main_wrap">
+        
         <div class="header">
             <a href="#" class="logo"><img src="images/logo.png" alt=""></a>
             <div class="copyright">CopyRight © 2019 深圳百秀信息技术股份有限公司<br>All Rights Reserved</div>
         </div>
-
+        
         <div class="login_form_con">
             <div class="login_title"></div>
             <form class="login_form">
@@ -27,10 +29,74 @@
                 <input type="password" class="input_pass" placeholder="密码">
                 <input type="submit" class="input_sub" value="登 录">
             </form>
-        </div>
 
-    </div> 
+        </div>
+        
+
+    </div>
+    <!-- 模态框 -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".modal">Small
+            modal</button>
+
+        <div class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">提示信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>账号密码有误,请重新输入</p>
+                    </div>
+
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
 
 </body>
 
 </html>
+<script src="./js/jquery-1.12.4.min.js"></script>
+<script src="./js/bootstrap/js/bootstrap.min.js"></script>
+<script>
+    $(function () {
+        // 阻止表单元素默认行为
+        $('form').submit(function (e) {
+            e.preventDefault()
+        })
+        $('.input_sub').click(function (event) {
+
+            //获取用户输入的账号密码并且去掉两边的空格
+            var user_name = $('.input_txt').val().trim();
+            var password = $('.input_pass').val().trim();
+
+            if (user_name == '' || password == '') {
+                $('.modal-body p').text('账号密码不能为空,请重新输入')
+                $('.modal').modal()
+                return
+            }
+            $.ajax({
+                url: 'https://autumnfish.cn/big/admin/login',
+                type: 'post',
+                data: {
+                    user_name: user_name,
+                    password: password
+                },
+                success: function (backData) {
+                    console.log(backData);
+                    if (backData.code == 200) {
+                        setTimeout(function (){
+                            window.location.href = './index.html'
+                        },1000)
+                    }
+                    else if (backData.code == 400) {
+                        $('.modal-body p').text('请输入正确的账号密码')
+                        $('.modal').modal()
+                        return
+                    }
+                }
+            })
+        })
+    })
+</script>
