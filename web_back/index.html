@@ -18,7 +18,7 @@
         <a href="#" class="logo"><img src="images/logo02.png" alt="logo"></a>
         <div class="user_info">
             <img src="images/2.jpg" alt="person">
-            <span>欢迎&nbsp;&nbsp;李思思</span>
+            <span>欢迎&nbsp;&nbsp;<i>李思思</i></span>
             <b>管理员</b>
         </div>
         <div class="menu">
@@ -141,6 +141,16 @@
 <script src="./js/bootstrap/js/bootstrap.min.js"></script>
 <script>
     $(function () {
+        $.ajax({
+            url: 'https://autumnfish.cn/big/admin/getuser',
+            type: 'get',
+            success: function (backData){
+                console.log(backData);
+                $('.user_info img').attr('src',backData.data.user_pic)
+                $('.user_center_link img').attr('src',backData.data.user_pic)
+                $('.user_info i').html(backData.data.nickname)
+            }
+        })
         $('.icon-tuichu').click(function () {
             $('.modal-logout').modal()
         })
