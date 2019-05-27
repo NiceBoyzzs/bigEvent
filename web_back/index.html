@@ -142,7 +142,7 @@
 <script>
     $(function () {
         $.ajax({
-            url: 'https://autumnfish.cn/big/admin/getuser',
+            url: 'http://localhost:8000/admin/getuser',
             type: 'get',
             success: function (backData){
                 console.log(backData);
@@ -156,7 +156,7 @@
         })
         $('.btn-logout').click(function (){
             $.ajax({
-                url: 'https://autumnfish.cn/big/admin/logout',
+                url: 'http://localhost:8000/admin/logout',
                 type: 'post',
                 success:function(backData){
                     console.log(backData);

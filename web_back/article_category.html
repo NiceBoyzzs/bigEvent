@@ -72,7 +72,8 @@
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-center">
-                            <a href="#" class="btn btn-success" data-toggle="modal" data-target="#addModal">新增分类</a>
+                            <a href="#" class="btn btn-success btn-add" data-toggle="modal"
+                                data-target="#addModal">新增分类</a>
                         </td>
                     </tr>
                 </tfoot>
@@ -80,56 +81,204 @@
         </div>
     </div>
 
-    <div class="modal fade" id="addModal" >
+    <div class="modal fade" id="addModal">
         <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
-              <h4 class="modal-title">新增分类</h4>
-            </div>
-            <div class="modal-body">
-              <form>
-                <div class="form-group">
-                  <label for="recipient-name" class="control-label">分类名称:</label>
-                  <input type="text" class="form-control" id="recipient-name">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title">新增分类</h4>
                 </div>
-                <div class="form-group">
-                  <label for="message-text" class="control-label">分类别名:</label>
-                  <input type="text" class="form-control" id="recipient-name">
+                <div class="modal-body">
+                    <form>
+                        <input type="hidden" name='id'>
+                        <div class="form-group">
+                            <label for="recipient-name" class="control-label">分类名称:</label>
+                            <input type="text" class="form-control" name="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="control-label">分类别名:</label>
+                            <input type="text" class="form-control" name="slug">
+                        </div>
+                    </form>
                 </div>
-              </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="model_shutoff">关闭</button>
+                    <button type="button" class="btn btn-primary" id="model_add">新增</button>
+                </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" id="model_shutoff">关闭</button>
-              <button type="button" class="btn btn-primary" id="model_add">新增</button>
-            </div>
-          </div>
         </div>
-      </div>
+    </div>
+    <script src="./js/template-web.js"></script>
+    <script id="cate" type="text/html">
+        {{each data}}
+        <tr>
+            <td> {{$value.name}} </td>
+            <td> {{$value.slug}} </td>
+            <td class="text-center">
+                <a href='javascript:editTr({"id":"{{$value.id}}","slug":"{{$value.slug}}","name":"{{$value.name}}"});' class="btn btn-info btn-xs">编辑</a>
+                <a href="javascript:deleteTr( {{$value.id}} );" class="btn btn-danger btn-xs">删除</a>
+              </td>
+        </tr>
+        {{/each}}
+    </script>
+    <script>
+        $('#addModal').modal({
+            show: false,
+            backdrop: false
+        });
 
-      <script>
-          $('#addModal').modal({
-            show:false,
-            backdrop:false
-          });
-
-          $('#model_shutoff').click(function(){
+        $('#model_shutoff').click(function () {
             alert('shutoff');
             $('#addModal').modal('hide');
-          });
+        });
 
-          $('#model_add').click(function(){
-            alert('add');
-            $('#addModal').modal('hide');
-          });
+        // $('#model_add').click(function () {
+        //     alert('add');
+        //     $('#addModal').modal('hide');
+        // });
 
-          $('.category_table').delegate('a','click',function(){
-              if($(this).hasClass('btn-info')){
+        // $('.category_table').delegate('a', 'click', function () {
+        //     if ($(this).hasClass('btn-info')) {
+        //         $('#addModal .modal-title').html('修改分类名称');
+        //         $('#addModal').modal('show');
+        //     }
+        // })
+        /*
+      获取分类的数据
+        请求地址：http://localhost:8000/admin/category_search
+        请求方式：get
+        请求参数：无
+        步骤
+        1. 进入到分类数据页面之后
+        2. ajax获取分类的数据
+        3. 数据获取到之后 渲染到页面上
+        1. 使用模板引擎渲染页面结构
+      分类新增
+        请求地址：http://localhost:8000/admin/category_add
+        请求方式：post
+        请求参数：
+          名称  	类型    	说明
+          name	string	类别名称
+          slug	string	别名
+        步骤
+        1. 点击新增弹出的modal框中 为新增按钮绑定点击事件
+        2. 获取用户输入的数据
+        3. 通过ajax提交到服务器
+        4. 提交成功之后
+          1. 本地的数据更新为最新的
+
+      区分 新增和编辑
+      弹出的对话框中设置内容
+        步骤
+        1. 模板中可以把数据填充到 editTr这个方法中
+        2. 增加这个方法，定义形参获取数据
+        3. 把数据填充到模态框中
+
+      删除数据
+        请求地址：http://localhost:8000/admin/category_delete
+        请求方式：post
+        请求参数：
+        步骤
+        1. 实现删除a标签绑定的那个方法
+        2. 每次调用方法是传入这一行数据对应的id
+        3. 调用接口
+        4. 提示删除成功之后 重新获取数据（局部刷新）
+
+
+        */
+        $(function () {
+            function getData() {
+                $.ajax({
+                    url: 'http://localhost:8000/admin/category_search',
+                    type: 'get',
+                    success: function (backData) {
+                        console.log(backData);
+                        $('tbody').html(template('cate', backData))
+                    }
+                })
+            }
+
+
+            window.editTr = function (back) {
+                console.log(back)
+                for (const key in back) {
+                    $('input[name=' + key + ']').val(back[key])
+                }
+            }
+
+            window.deleteTr = function (id) {
+                $.ajax({
+                    url: 'http://localhost:8000/admin/category_delete',
+                    type: 'post',
+                    data: {
+                        id: id
+                    },
+                    success: function (backData) {
+                        console.log(backData);
+                        if (backData.code == 200) {
+                            getData()
+                        }
+                    }
+                })
+            }
+            // 默认调用一次
+            getData()
+
+            //新增按钮点击事件
+            $('#model_add').click(function () {
+                console.log($('form').serialize());
+                if ($(this).hasClass('btn-success')) {
+                    // 编辑
+                    // 获取数据
+                    $.ajax({
+                        url: 'http://localhost:8000/admin/category_edit',
+                        data: $('form').serialize(),
+                        type: 'post',
+                        success: function (backData) {
+                            console.log(backData)
+                            getData()
+                        }
+                    })
+                } else {
+                    // 获取数据
+                    // var name = $('input[name=name]').val()
+                    // var slug = $('input[name=slug]').val()
+                    // jQ封装好的方法 直接获取 表单元素的的value 拼接为 key=value&key2=value2 必须有name属性
+                    // console.log($('form').serialize())
+                    $.ajax({
+                        url: 'http://localhost:8000/admin/category_add',
+                        type: 'post',
+                        // data: {
+                        //   name: name,
+                        //   slug: slug
+                        // },
+                        data: $('form').serialize(), // name=xx&slug=xxx
+                        success: function (backData) {
+                            console.log(backData)
+                            // 重新获取数据
+                            getData()
+                        }
+                    })
+                }
+
+                $('#addModal').modal('hide');
+            })
+
+            $('.btn-add').click(function () {
+                $('.modal-title').text('新增分类')
+                $('#model_add').text('新增').removeClass('btn-success')
+            })
+
+            $('.category_table').on('click', 'a.btn-info', function () {
+
                 $('#addModal .modal-title').html('修改分类名称');
+                $('#model_add').text('编辑').addClass('btn-success')
                 $('#addModal').modal('show');
-              }
-          })      
-      </script>
+
+            })
+
+        })
+    </script>
 
 </body>
 
