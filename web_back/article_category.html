@@ -267,6 +267,7 @@
             $('.btn-add').click(function () {
                 $('.modal-title').text('新增分类')
                 $('#model_add').text('新增').removeClass('btn-success')
+                $('form input').val('')
             })
 
             $('.category_table').on('click', 'a.btn-info', function () {
